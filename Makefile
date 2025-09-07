@@ -1,5 +1,6 @@
 CC = gcc
-CFLAGS = -g -Wall
+CFLAGS = -g -Wall $(shell pkg-config --cflags libnotify)
+LDFLAGS = $(shell pkg-config --libs libnotify)
 
 SRC_D = src
 OBJ_D = obj
@@ -17,7 +18,7 @@ release: clean
 release: $(BIN)
 
 $(BIN): $(OBJS) | $(BIN_D)
-	$(CC) $(CFLAGS) $(OBJS) -o $@
+	$(CC) $(CFLAGS) $(OBJS) -o $@ $(LDFLAGS)
 
 $(OBJ_D)/%.o: $(SRC_D)/%.c $(SRC_D)/%.h | $(OBJ_D)
 	$(CC) $(CFLAGS) -c $< -o $@

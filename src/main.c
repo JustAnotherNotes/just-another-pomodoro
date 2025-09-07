@@ -6,6 +6,8 @@
 #include <threads.h>
 #include <termios.h> // tcgetattr(); tcsetattr(); struct termios; TCSAFLUSH; ICANON; ECHO
 
+#include "jap_notify.h"
+
 #define ESC "\033"
 #define CSI "["       // Control Sequence Introducer
 #define HOME_POS "H"  // moves cursor to home position (0, 0)
@@ -14,7 +16,6 @@
 #define ERASE_LINE "2K"
 #define ERASE_SCR "2J"
 #define CARRIAGE_RETURN "\r"
-#define BELL "\a"
 
 const int INFO_LINES_NUM = 4;
 
@@ -75,13 +76,13 @@ void enable_raw_mode()
     tcgetattr(STDIN_FILENO, &raw);
     tcgetattr(STDIN_FILENO, &original);
 
-    atexit(&disable_raw_mode);
-
     // Turn off canonical mode
     // Turn off ECHO mode so that keyboard is not printing to the terminal
     // ICANON and ECHO is bitflag. ~ is binary NOT operator
     raw.c_lflag &= ~(ECHO | ICANON);
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
+
+    atexit(&disable_raw_mode);
 }
 
 int timer(void *arg)
@@ -164,7 +165,6 @@ int input(void *arg)
         }
         else if (input == 'q')
         {
-            // TODO why so long?
             is_alive = false;
 
             last_action = "quit";
@@ -249,11 +249,11 @@ int draw(void *arg)
                 if (t == WORK)
                 {
                     p[p_index].complete_count += 1;
+                    notify_user("Work interval completed", "Take some rest");
+                } else // REST
+                {
+                    notify_user("Rest interval completed", "Prepare to work");
                 }
-
-                printf(BELL);
-                // Require 'libnotify-bin'
-                system("notify-send 'jap' 'Interval completed'");
             }
         }
 
@@ -300,10 +300,8 @@ int main(int argc, char *argv[])
         thrd_sleep(&framerate, NULL);
     }
 
-    disable_raw_mode();
     // printf(ESC CSI ERASE_SCR ESC CSI HOME_POS);
     printf(ESC CSI "%d" NEXT_LINE, INFO_LINES_NUM);
 
-    thrd_exit(EXIT_SUCCESS);
     return 0;
 }
