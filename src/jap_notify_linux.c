@@ -1,6 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <libnotify/notify.h>
+#include <stdbool.h>
+#include <libnotify/notify.h> // Require 'libnotify-bin'
 
 #include "jap_notify.h"
 
@@ -24,8 +23,6 @@ void notify_clean()
 bool notify_user(char *title, char *msg)
 {
     printf(BELL);
-
-    // Require 'libnotify-bin'
 
     if (!notify_is_initted())
     {

@@ -1,0 +1,36 @@
+CC = gcc
+CFLAGS = -g -Wall $(shell pkg-config --cflags libnotify)
+LDFLAGS = $(shell pkg-config --libs libnotify)
+
+SRC_D = src
+OBJ_D = obj
+BIN_D = bin
+
+OBJS = $(OBJ_D)/main.o $(OBJ_D)/jap_notify_linux.o
+
+BIN = $(BIN_D)/jap
+
+debug: $(BIN)
+
+release: CFLAGS = -O2 -DNDEBUG $(shell pkg-config --cflags libnotify)
+release: clean $(BIN)
+
+$(BIN): $(OBJS) | $(BIN_D)
+	$(CC) $(CFLAGS) $(OBJS) -o $@ $(LDFLAGS)
+
+$(OBJ_D)/main.o: $(SRC_D)/main.c | $(OBJ_D)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ_D)/jap_notify_linux.o: $(SRC_D)/jap_notify_linux.c $(SRC_D)/jap_notify.h | $(OBJ_D)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BIN_D):
+	mkdir -p $@
+
+$(OBJ_D):
+	mkdir -p $@
+
+clean:
+	rm -rf $(BIN_D) $(OBJ_D)
+
+.PHONY: clean release debug
