@@ -24,7 +24,9 @@ Work interval is 25 minutes and rest interval is 5. Long rest interval is not su
 
 Work and rest intervals follows each other and if you skip for example work interval than next will be rest interval.
 
-<img width="516" height="155" alt="image" src="https://github.com/user-attachments/assets/a09c5484-9476-4138-95a0-a73ff0077bb1" />
+<img width="516" height="153" alt="image" src="https://github.com/user-attachments/assets/24ac83a4-692c-4fa2-a3b1-6311564c448d" />
+
+<img width="446" height="171" alt="image" src="https://github.com/user-attachments/assets/585361ad-24ae-4cf4-9eb4-e5689bc0f654" />
 
 # Roadmap
 
