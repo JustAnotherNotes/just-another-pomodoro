@@ -1,5 +1,35 @@
-main: main.c
-	gcc main.c -o jap
+CC = gcc
+CFLAGS = -g -Wall
+
+SRC_D = src
+OBJ_D = obj
+BIN_D = bin
+
+SRCS = $(wildcard $(SRC_D)/*.c)
+OBJS = $(patsubst $(SRC_D)/%.c, $(OBJ_D)/%.o, $(SRCS))
+
+BIN = $(BIN_D)/jap
+
+all: $(BIN)
+
+release: CFLAGS = -O2 -DNDEBUG
+release: clean
+release: $(BIN)
+
+$(BIN): $(OBJS) | $(BIN_D)
+	$(CC) $(CFLAGS) $(OBJS) -o $@
+
+$(OBJ_D)/%.o: $(SRC_D)/%.c $(SRC_D)/%.h | $(OBJ_D)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ_D)/%.o: $(SRC_D)/%.c | $(OBJ_D)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BIN_D):
+	mkdir -p $@
+
+$(OBJ_D):
+	mkdir -p $@
 
 clean:
-	rm jap
+	rm -rf $(BIN_D) $(OBJ_D)

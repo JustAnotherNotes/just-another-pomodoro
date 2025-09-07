@@ -96,6 +96,8 @@ int timer(void *arg)
         }
         thrd_sleep(&sleep, NULL);
     }
+
+    thrd_exit(EXIT_SUCCESS);
 }
 
 int input(void *arg)
