@@ -7,7 +7,10 @@ SRC_D = src
 OBJ_D = obj
 BIN_D = bin
 
-SRCS = $(SRC_D)/main.c $(SRC_D)/jap_notify_linux.c
+SRCS = $(SRC_D)/main.c \
+	$(SRC_D)/jap_notify_linux.c \
+	$(SRC_D)/jap_term_ctl_unix.c \
+	$(SRC_D)/jap_winsize_unix.c
 OBJS = $(patsubst $(SRC_D)/%.c, $(OBJ_D)/%.o, $(SRCS))
 
 BIN = $(BIN_D)/jap
@@ -20,7 +23,7 @@ release: clean $(BIN)
 $(BIN): $(OBJS) | $(BIN_D)
 	$(CC) $(CFLAGS) $(OBJS) -o $@ $(LDFLAGS)
 
-$(OBJ_D)/%.o: $(SRC_D)/%.c $(SRC_D)/jap_notify.h | $(OBJ_D)
+$(OBJ_D)/%.o: $(SRC_D)/%.c $(SRC_D)/jap_notify.h $(SRC_D)/jap_term_ctl.h $(SRC_D)/jap_winsize.h | $(OBJ_D)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BIN_D):

@@ -1,5 +1,4 @@
 CC = gcc
-PKG = 
 CFLAGS = -g -Wall
 LDFLAGS = -pthread
 
