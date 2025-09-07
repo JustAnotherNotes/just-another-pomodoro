@@ -1,2 +1,38 @@
-dummy:
-	echo "Not implemented yet"
+CC = gcc
+PKG = 
+CFLAGS = -g -Wall
+LDFLAGS = -pthread
+
+SRC_D = src
+OBJ_D = obj
+BIN_D = bin
+
+SRCS = $(SRC_D)/main.c \
+	$(SRC_D)/jap_notify_win.c \
+	$(SRC_D)/jap_term_ctl_win.c \
+	$(SRC_D)/jap_winsize_win.c
+OBJS = $(patsubst $(SRC_D)/%.c, $(OBJ_D)/%.o, $(SRCS))
+
+BIN = $(BIN_D)/jap.exe
+
+debug: $(BIN)
+
+release: CFLAGS = -O2 -DNDEBUG
+release: clean $(BIN)
+
+$(BIN): $(OBJS) | $(BIN_D)
+	$(CC) $(CFLAGS) $(OBJS) -o $@ $(LDFLAGS)
+
+$(OBJ_D)/%.o: $(SRC_D)/%.c $(SRC_D)/jap_notify.h $(SRC_D)/jap_term_ctl.h $(SRC_D)/jap_winsize.h | $(OBJ_D)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BIN_D):
+	mkdir -p $@
+
+$(OBJ_D):
+	mkdir -p $@
+
+clean:
+	rm -rf $(BIN_D) $(OBJ_D)
+
+.PHONY: clean release debug

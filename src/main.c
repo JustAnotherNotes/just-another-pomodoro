@@ -1,11 +1,11 @@
 #include <stdio.h>  // printf(); fflush(); stdout;
 #include <stdlib.h> // system(); EXIT_SUCCESS;
 #include <stdbool.h>
-#include <sys/ioctl.h> // ioctl(); struct winsize; TIOCGWINSZ;
-#include <unistd.h>    // STDIN_FILENO; STDOUT_FILENO;
-#include <threads.h>
-#include <termios.h> // tcgetattr(); tcsetattr(); struct termios; TCSAFLUSH; ICANON; ECHO
+#include <pthread.h>
+#include <time.h>
 
+#include "jap_term_ctl.h"
+#include "jap_winsize.h"
 #include "jap_notify.h"
 
 #define ESC "\033"
@@ -46,8 +46,6 @@ type t = REST;
 
 char *last_action = "none";
 
-struct termios original;
-
 char *type_to_str(type type)
 {
     char *s = "";
@@ -63,29 +61,7 @@ char *type_to_str(type type)
     return s;
 }
 
-void disable_raw_mode()
-{
-    tcsetattr(STDIN_FILENO, TCSAFLUSH, &original);
-}
-
-void enable_raw_mode()
-{
-    struct termios raw;
-
-    // Save the state of the terminal
-    tcgetattr(STDIN_FILENO, &raw);
-    tcgetattr(STDIN_FILENO, &original);
-
-    // Turn off canonical mode
-    // Turn off ECHO mode so that keyboard is not printing to the terminal
-    // ICANON and ECHO is bitflag. ~ is binary NOT operator
-    raw.c_lflag &= ~(ECHO | ICANON);
-    tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
-
-    atexit(&disable_raw_mode);
-}
-
-int timer(void *arg)
+void *timer(void *arg)
 {
     struct timespec sleep = {.tv_sec = 1};
 
@@ -95,17 +71,19 @@ int timer(void *arg)
         {
             p[p_index].time_cur -= 1;
         }
-        thrd_sleep(&sleep, NULL);
+        nanosleep(&sleep, NULL);
     }
 
-    thrd_exit(EXIT_SUCCESS);
+    return NULL;
 }
 
-int input(void *arg)
+void *input(void *arg)
 {
     char input;
 
     enable_raw_mode();
+    atexit(&disable_raw_mode);
+
     while (is_alive)
     {
         input = getchar();
@@ -171,13 +149,13 @@ int input(void *arg)
         }
     }
 
-    thrd_exit(EXIT_SUCCESS);
+    return NULL;
 }
 
-int draw(void *arg)
+void *draw(void *arg)
 {
-    struct winsize window;
-    ioctl(STDOUT_FILENO, TIOCGWINSZ, &window);
+    jap_winsize_t winsize;
+    get_winsize(&winsize);
 
     int min;
     int sec;
@@ -187,7 +165,7 @@ int draw(void *arg)
     char *type_str = "";
 
     // TODO blink if less then 20, need to fix
-    float prog_max = window.ws_col - 20;
+    float prog_max = winsize.cols - 20;
     float prog_cur;
 
     int i;
@@ -271,33 +249,33 @@ int draw(void *arg)
         printf("(last action: %s)\n", last_action);
 
         fflush(stdout);
-        thrd_sleep(&framerate, NULL);
+        nanosleep(&framerate, NULL);
         printf(ESC CSI "%d" PREV_LINE, INFO_LINES_NUM);
     }
 
-    thrd_exit(EXIT_SUCCESS);
+    return NULL;
 }
 
 int main(int argc, char *argv[])
 {
-    thrd_t t_draw;
-    thrd_t t_input;
-    thrd_t t_timer;
+    pthread_t t_draw;
+    pthread_t t_input;
+    pthread_t t_timer;
 
-    thrd_create(&t_draw, draw, NULL);
-    thrd_create(&t_input, input, NULL);
-    thrd_create(&t_timer, timer, NULL);
+    pthread_create(&t_draw, NULL, draw, NULL);
+    pthread_create(&t_input, NULL, input, NULL);
+    pthread_create(&t_timer, NULL, timer, NULL);
 
     while (true)
     {
         if (!is_alive)
         {
-            thrd_detach(t_draw);
-            thrd_detach(t_input);
-            thrd_detach(t_timer);
+            pthread_detach(t_draw);
+            pthread_detach(t_input);
+            pthread_detach(t_timer);
             break;
         }
-        thrd_sleep(&framerate, NULL);
+        nanosleep(&framerate, NULL);
     }
 
     // printf(ESC CSI ERASE_SCR ESC CSI HOME_POS);

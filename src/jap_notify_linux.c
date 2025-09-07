@@ -3,8 +3,6 @@
 
 #include "jap_notify.h"
 
-#define BELL "\a"
-
 NotifyNotification *notifications[20]; // 10 hours * 2 pomodoro
 int n_size = 0;
 
