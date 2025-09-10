@@ -94,8 +94,16 @@ void *input(void *arg) {
 
             last_action = "start";
         } else if (input == 'k') {
-            p[p_index].time_cur = 0;
-            p[p_index].is_active = false;
+            if (p[p_index].is_active) {
+                p[p_index].time_cur = 0;
+                p[p_index].is_active = false;
+            } else {
+                if (t == WORK) {
+                    t = REST;
+                } else {
+                    t = WORK;
+                }
+            }
 
             last_action = "skip";
         } else if (input == 'n') {
@@ -114,6 +122,7 @@ void *input(void *arg) {
                 p[i].complete_count = 0;
             }
             p_index = 0;
+            t = REST;
 
             last_action = "reset";
         } else if (input == 'q') {
