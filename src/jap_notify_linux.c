@@ -1,5 +1,5 @@
-#include <stdbool.h>
 #include <libnotify/notify.h> // Require 'libnotify-bin'
+#include <stdbool.h>
 
 #include "jap_notify.h"
 
@@ -18,7 +18,7 @@ void jap_clean() {
 }
 
 bool jap_notify_init() {
-    notifications = malloc(sizeof(NotifyNotification*) * n_capacity);
+    notifications = malloc(sizeof(NotifyNotification *) * n_capacity);
 
     if (!notify_is_initted()) {
         notify_init("Just Another Pomodoro");
@@ -36,8 +36,8 @@ bool jap_notify_show(char *title, char *msg) {
 
     if (n_size == n_capacity) {
         n_capacity *= 2;
-        notifications = realloc(
-            notifications, sizeof(NotifyNotification*) * n_capacity);
+        notifications =
+            realloc(notifications, sizeof(NotifyNotification *) * n_capacity);
     }
     notifications[n_size++] = n;
 

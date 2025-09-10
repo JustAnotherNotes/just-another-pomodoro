@@ -5,13 +5,9 @@
 
 struct termios original;
 
-void disable_raw_mode()
-{
-    tcsetattr(STDIN_FILENO, TCSAFLUSH, &original);
-}
+void disable_raw_mode() { tcsetattr(STDIN_FILENO, TCSAFLUSH, &original); }
 
-void enable_raw_mode()
-{
+void enable_raw_mode() {
     struct termios raw;
 
     // Save the state of the terminal

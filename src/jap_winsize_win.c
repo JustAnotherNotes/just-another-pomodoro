@@ -3,8 +3,7 @@
 
 #include "jap_winsize.h"
 
-bool get_winsize(jap_winsize_t *winsize)
-{
+bool get_winsize(jap_winsize_t *winsize) {
     CONSOLE_SCREEN_BUFFER_INFO csbi;
     GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
 

@@ -4,14 +4,12 @@
 
 static DWORD original;
 
-void disable_raw_mode()
-{
+void disable_raw_mode() {
     HANDLE stdin_handle = GetStdHandle(STD_INPUT_HANDLE);
     SetConsoleMode(stdin_handle, original);
 }
 
-void enable_raw_mode()
-{
+void enable_raw_mode() {
     HANDLE stdin_handle = GetStdHandle(STD_INPUT_HANDLE);
     DWORD raw;
 

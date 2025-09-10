@@ -1,12 +1,12 @@
+#include <pthread.h>
+#include <stdbool.h>
 #include <stdio.h>  // printf(); fflush(); stdout;
 #include <stdlib.h> // system(); EXIT_SUCCESS;
-#include <stdbool.h>
-#include <pthread.h>
 #include <time.h>
 
+#include "jap_notify.h"
 #include "jap_term_ctl.h"
 #include "jap_winsize.h"
-#include "jap_notify.h"
 
 #define ESC "\033"
 #define CSI "["       // Control Sequence Introducer
@@ -22,7 +22,7 @@ const int WORK_LEN_SEC = 25 * 60;
 const int REST_LEN_SEC = 5 * 60;
 
 bool is_alive = true;
-struct timespec framerate = { .tv_nsec = 33000000 }; // 33 ms (30 fps)
+struct timespec framerate = {.tv_nsec = 33000000}; // 33 ms (30 fps)
 
 typedef struct {
     bool is_active;
@@ -35,10 +35,7 @@ int p_capacity = 20; // 10 hours * 2 pomodoro
 int p_index = 0;
 pomodoro_t *p;
 
-typedef enum {
-    WORK,
-    REST
-} type;
+typedef enum { WORK, REST } type;
 
 type t = REST;
 
@@ -47,12 +44,12 @@ char *last_action = "none";
 char *type_to_str(type type) {
     char *s = "";
     switch (type) {
-        case WORK:
-            s = "Work";
-            break;
-        case REST:
-            s = "Rest";
-            break;
+    case WORK:
+        s = "Work";
+        break;
+    case REST:
+        s = "Rest";
+        break;
     }
     return s;
 }
@@ -80,7 +77,8 @@ void *input(void *arg) {
         input = getchar();
 
         if (input == 's') {
-            if (p[p_index].is_active) continue;
+            if (p[p_index].is_active)
+                continue;
 
             if (t == WORK) {
                 t = REST;
@@ -108,7 +106,8 @@ void *input(void *arg) {
 
             last_action = "skip";
         } else if (input == 'n') {
-            if (p[p_index].is_active) continue;
+            if (p[p_index].is_active)
+                continue;
 
             p_index++;
             if (p_index == p_capacity) {
@@ -123,7 +122,8 @@ void *input(void *arg) {
 
             last_action = "next";
         } else if (input == 'r') {
-            if (p[p_index].is_active) continue;
+            if (p[p_index].is_active)
+                continue;
 
             for (int i = 0; i <= p_index; i++) {
                 p[i].is_active = false;
@@ -180,7 +180,8 @@ void *draw(void *arg) {
 
             prog_cur = p[p_index].time_cur * prog_max / p[p_index].time_len;
 
-            printf("%s %s%d:%s%d [", type_str, min_leading, min, sec_leading, sec);
+            printf("%s %s%d:%s%d [", type_str, min_leading, min, sec_leading,
+                   sec);
             for (int i = 0; i < prog_cur; i++) {
                 printf("|");
             }
@@ -200,11 +201,11 @@ void *draw(void *arg) {
                 p[p_index].is_active = false;
                 if (t == WORK) {
                     p[p_index].complete_count += 1;
-                    jap_notify_show(
-                        "Work interval completed", "Take some rest");
+                    jap_notify_show("Work interval completed",
+                                    "Take some rest");
                 } else { // REST
-                    jap_notify_show(
-                        "Rest interval completed", "Prepare to work");
+                    jap_notify_show("Rest interval completed",
+                                    "Prepare to work");
                 }
             }
         }

@@ -3,8 +3,7 @@
 
 #include "jap_winsize.h"
 
-bool get_winsize(jap_winsize_t *winsize)
-{
+bool get_winsize(jap_winsize_t *winsize) {
     struct winsize window;
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &window);
 
