@@ -18,10 +18,8 @@
 
 const int INFO_LINES_NUM = 4;
 
-// const int WORK_LEN_SEC = 25 * 60;
-// const int REST_LEN_SEC = 5 * 60;
-const int WORK_LEN_SEC = 4;
-const int REST_LEN_SEC = 2;
+const int WORK_LEN_SEC = 25 * 60;
+const int REST_LEN_SEC = 5 * 60;
 
 bool is_alive = true;
 struct timespec framerate = { .tv_nsec = 33000000 }; // 33 ms (30 fps)
