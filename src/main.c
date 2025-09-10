@@ -137,9 +137,8 @@ void *draw(void *arg) {
 
     char *type_str = "";
 
-    // TODO blink if less then 20, need to fix
-    float prog_max = winsize.cols - 20;
-    float prog_cur;
+    const int prog_max = winsize.cols - 14;
+    int prog_cur;
 
     int i;
 
