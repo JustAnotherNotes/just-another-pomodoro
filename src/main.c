@@ -33,8 +33,9 @@ typedef struct {
     int complete_count;
 } pomodoro_t;
 
-pomodoro_t p[20]; // 10 hours * 2 pomodoro
+int p_capacity = 20; // 10 hours * 2 pomodoro
 int p_index = 0;
+pomodoro_t *p;
 
 typedef enum {
     WORK,
@@ -112,6 +113,14 @@ void *input(void *arg) {
             if (p[p_index].is_active) continue;
 
             p_index++;
+            if (p_index == p_capacity) {
+                int old_cap = p_capacity;
+                p_capacity *= 2;
+                p = realloc(p, p_capacity * sizeof(pomodoro_t));
+                for (int i = old_cap; i < p_capacity; i++) {
+                    p[i] = (pomodoro_t){0};
+                }
+            }
             t = REST;
 
             last_action = "next";
@@ -223,6 +232,7 @@ void *draw(void *arg) {
 }
 
 int main(int argc, char *argv[]) {
+    p = calloc(p_capacity, sizeof(pomodoro_t));
     jap_notify_init();
 
     pthread_t t_draw;
