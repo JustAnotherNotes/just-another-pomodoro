@@ -15,6 +15,12 @@ OBJS = $(patsubst $(SRC_D)/%.c, $(OBJ_D)/%.o, $(SRCS))
 
 BIN = $(BIN_D)/jap
 
+build: debug
+
+run: build
+	@echo
+	@$(BIN)
+
 debug: $(BIN)
 
 release: CFLAGS = -O2 -DNDEBUG $(shell pkg-config --cflags $(PKG))
