@@ -30,6 +30,8 @@ Work and rest intervals follows each other and if you skip for example work inte
 
 # Roadmap
 
-- [ ] add support for Windows
-- [ ] add support for MacOS
+- [x] add support for Windows
+- [x] add support for MacOS
 - [ ] add auto mode (work and rest intervals followed by each other without user actions)
+- [ ] impl notifications on Windows
+- [ ] impl notifications on MacOS
