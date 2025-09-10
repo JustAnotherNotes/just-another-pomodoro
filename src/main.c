@@ -15,7 +15,6 @@
 #define PREV_LINE "F" // moves cursor to beginning of previous line, # lines up
 #define ERASE_LINE "2K"
 #define ERASE_SCR "2J"
-#define CARRIAGE_RETURN "\r"
 
 const int INFO_LINES_NUM = 4;
 
@@ -23,10 +22,9 @@ const int WORK_LEN_SEC = 25 * 60;
 const int REST_LEN_SEC = 5 * 60;
 
 bool is_alive = true;
-struct timespec framerate = {.tv_nsec = 33000000}; // 33 ms (30 fps)
+struct timespec framerate = { .tv_nsec = 33000000 }; // 33 ms (30 fps)
 
-typedef struct
-{
+typedef struct {
     bool is_active;
     int time_len;
     int time_cur;
@@ -36,8 +34,7 @@ typedef struct
 pomodoro_t p[20]; // 10 hours * 2 pomodoro
 int p_index = 0;
 
-typedef enum
-{
+typedef enum {
     WORK,
     REST
 } type;
@@ -46,29 +43,24 @@ type t = REST;
 
 char *last_action = "none";
 
-char *type_to_str(type type)
-{
+char *type_to_str(type type) {
     char *s = "";
-    switch (type)
-    {
-    case WORK:
-        s = "Work";
-        break;
-    case REST:
-        s = "Rest";
-        break;
+    switch (type) {
+        case WORK:
+            s = "Work";
+            break;
+        case REST:
+            s = "Rest";
+            break;
     }
     return s;
 }
 
-void *timer(void *arg)
-{
+void *timer(void *arg) {
     struct timespec sleep = {.tv_sec = 1};
 
-    while (is_alive)
-    {
-        if (p[p_index].time_cur > 0)
-        {
+    while (is_alive) {
+        if (p[p_index].time_cur > 0) {
             p[p_index].time_cur -= 1;
         }
         nanosleep(&sleep, NULL);
@@ -77,30 +69,23 @@ void *timer(void *arg)
     return NULL;
 }
 
-void *input(void *arg)
-{
+void *input(void *arg) {
     char input;
 
     enable_raw_mode();
     atexit(&disable_raw_mode);
 
-    while (is_alive)
-    {
+    while (is_alive) {
         input = getchar();
 
-        if (input == 's')
-        {
-            if (p[p_index].is_active)
-                continue;
+        if (input == 's') {
+            if (p[p_index].is_active) continue;
 
-            if (t == WORK)
-            {
+            if (t == WORK) {
                 t = REST;
                 p[p_index].time_len = REST_LEN_SEC;
                 p[p_index].time_cur = REST_LEN_SEC;
-            }
-            else // REST
-            {
+            } else { // REST
                 t = WORK;
                 p[p_index].time_len = WORK_LEN_SEC;
                 p[p_index].time_cur = WORK_LEN_SEC;
@@ -108,31 +93,22 @@ void *input(void *arg)
             p[p_index].is_active = true;
 
             last_action = "start";
-        }
-        else if (input == 'k')
-        {
+        } else if (input == 'k') {
             p[p_index].time_cur = 0;
             p[p_index].is_active = false;
 
             last_action = "skip";
-        }
-        else if (input == 'n')
-        {
-            if (p[p_index].is_active)
-                continue;
+        } else if (input == 'n') {
+            if (p[p_index].is_active) continue;
 
             p_index++;
             t = REST;
 
             last_action = "next";
-        }
-        else if (input == 'r')
-        {
-            if (p[p_index].is_active)
-                continue;
+        } else if (input == 'r') {
+            if (p[p_index].is_active) continue;
 
-            for (int i = 0; i <= p_index; i++)
-            {
+            for (int i = 0; i <= p_index; i++) {
                 p[i].is_active = false;
                 p[i].time_cur = 0;
                 p[i].complete_count = 0;
@@ -140,9 +116,7 @@ void *input(void *arg)
             p_index = 0;
 
             last_action = "reset";
-        }
-        else if (input == 'q')
-        {
+        } else if (input == 'q') {
             is_alive = false;
 
             last_action = "quit";
@@ -152,8 +126,7 @@ void *input(void *arg)
     return NULL;
 }
 
-void *draw(void *arg)
-{
+void *draw(void *arg) {
     jap_winsize_t winsize;
     get_winsize(&winsize);
 
@@ -170,27 +143,19 @@ void *draw(void *arg)
 
     int i;
 
-    while (is_alive)
-    {
-        if (p[p_index].time_cur > 0)
-        {
+    while (is_alive) {
+        if (p[p_index].time_cur > 0) {
             min = p[p_index].time_cur / 60;
             sec = p[p_index].time_cur % 60;
 
-            if (min < 10)
-            {
+            if (min < 10) {
                 min_leading = "0";
-            }
-            else
-            {
+            } else {
                 min_leading = "";
             }
-            if (sec < 10)
-            {
+            if (sec < 10) {
                 sec_leading = "0";
-            }
-            else
-            {
+            } else {
                 sec_leading = "";
             }
 
@@ -199,37 +164,27 @@ void *draw(void *arg)
             prog_cur = p[p_index].time_cur * prog_max / p[p_index].time_len;
 
             printf("%s %s%d:%s%d [", type_str, min_leading, min, sec_leading, sec);
-            for (int i = 0; i < prog_cur; i++)
-            {
+            for (int i = 0; i < prog_cur; i++) {
                 printf("|");
             }
-            for (int j = prog_cur; j < prog_max; j++)
-            {
+            for (int j = prog_cur; j < prog_max; j++) {
                 printf(" ");
             }
             printf("]\n");
-        }
-        else
-        {
+        } else {
             printf(ESC CSI ERASE_LINE);
-            if (t == WORK)
-            {
+            if (t == WORK) {
                 printf("Completed. Rest next.\n");
-            }
-            else // REST
-            {
+            } else { // REST
                 printf("Completed. Work next.\n");
             }
 
-            if (p[p_index].is_active)
-            {
+            if (p[p_index].is_active) {
                 p[p_index].is_active = false;
-                if (t == WORK)
-                {
+                if (t == WORK) {
                     p[p_index].complete_count += 1;
                     notify_user("Work interval completed", "Take some rest");
-                } else // REST
-                {
+                } else { // REST
                     notify_user("Rest interval completed", "Prepare to work");
                 }
             }
@@ -237,8 +192,7 @@ void *draw(void *arg)
 
         printf(ESC CSI ERASE_LINE);
         printf("Pomodoros: ");
-        for (i = 0; i <= p_index; i++)
-        {
+        for (i = 0; i <= p_index; i++) {
             printf("%d ", p[i].complete_count);
         }
         printf("\n");
@@ -256,8 +210,7 @@ void *draw(void *arg)
     return NULL;
 }
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     pthread_t t_draw;
     pthread_t t_input;
     pthread_t t_timer;
@@ -266,10 +219,8 @@ int main(int argc, char *argv[])
     pthread_create(&t_input, NULL, input, NULL);
     pthread_create(&t_timer, NULL, timer, NULL);
 
-    while (true)
-    {
-        if (!is_alive)
-        {
+    while (true) {
+        if (!is_alive) {
             pthread_detach(t_draw);
             pthread_detach(t_input);
             pthread_detach(t_timer);
