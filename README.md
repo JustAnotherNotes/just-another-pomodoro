@@ -4,11 +4,19 @@ This is just another (CLI) pomodoro timer. Simple and minimalistic but functiona
 
 It can be said that it is used as internal tool for working on notes project. But you can try it out, maybe you will find it useful.
 
-# Support platforms
+# Platforms support
 
-For now it works only on Linux and requires `libnotify-bin` package for notifications. Terminal bell is used in combination with notification thus maybe you need to enable it too.
+#### Linux
 
-I plan to add support for Windows and MacOS in foreseeable future.
+Full support: everything works just fine. Only requires `libnotify-bin` package for notifications.
+
+#### Windows
+
+Limited supprt: in MSYS2/MinGW everything works just fine. But in PowerShell notifications don't work. PowerShell has once more problem - flikering cursor, but I think this is system terminal behavior because vcpkg progress bar has the same behavior.
+
+#### MacOS
+
+Don't know support: I have no Mac to check if it works. But almost everything must work except notifications which is not implemented.
 
 # Screenshots
 
@@ -30,8 +38,4 @@ Work and rest intervals follows each other and if you skip for example work inte
 
 # Roadmap
 
-- [x] add support for Windows
-- [x] add support for MacOS
 - [ ] add auto mode (work and rest intervals followed by each other without user actions)
-- [ ] impl notifications on Windows
-- [ ] impl notifications on MacOS
