@@ -214,7 +214,12 @@ void *draw(void *arg) {
         printf(ESC CSI ERASE_LINE);
         printf("Pomodoros: ");
         for (i = 0; i <= p_index; i++) {
-            printf("%d ", p[i].complete_count);
+            if (i < winsize.cols / 2.4) {
+                printf("%d ", p[i].complete_count);
+            } else {
+                printf("...");
+                break;
+            }
         }
         printf("\n");
 
