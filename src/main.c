@@ -18,8 +18,10 @@
 
 const int INFO_LINES_NUM = 4;
 
-const int WORK_LEN_SEC = 25 * 60;
-const int REST_LEN_SEC = 5 * 60;
+// const int WORK_LEN_SEC = 25 * 60;
+// const int REST_LEN_SEC = 5 * 60;
+const int WORK_LEN_SEC = 4;
+const int REST_LEN_SEC = 2;
 
 bool is_alive = true;
 struct timespec framerate = { .tv_nsec = 33000000 }; // 33 ms (30 fps)
@@ -191,9 +193,11 @@ void *draw(void *arg) {
                 p[p_index].is_active = false;
                 if (t == WORK) {
                     p[p_index].complete_count += 1;
-                    notify_user("Work interval completed", "Take some rest");
+                    jap_notify_show(
+                        "Work interval completed", "Take some rest");
                 } else { // REST
-                    notify_user("Rest interval completed", "Prepare to work");
+                    jap_notify_show(
+                        "Rest interval completed", "Prepare to work");
                 }
             }
         }
@@ -219,6 +223,8 @@ void *draw(void *arg) {
 }
 
 int main(int argc, char *argv[]) {
+    jap_notify_init();
+
     pthread_t t_draw;
     pthread_t t_input;
     pthread_t t_timer;

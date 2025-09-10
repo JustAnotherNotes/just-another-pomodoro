@@ -5,6 +5,8 @@
 
 #define BELL "\a"
 
-bool notify_user(char *title, char *msg);
+bool jap_notify_init();
 
-#endif
+bool jap_notify_show(char *title, char *msg);
+
+#endif // JAP_NOTIFY_H
